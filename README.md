@@ -1,98 +1,148 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+````markdown
+# MSME Vendor Payment Tracking System - Backend
 
-## Description
+This project is a backend API system for **MSMEs to manage vendor payments, purchase orders, and outstanding balances**. Built using **NestJS** and **MySQL**, the system provides RESTful endpoints for vendors, purchase orders, payments, and analytics.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## Setup Instructions
 
-```bash
-$ npm install
+### Prerequisites
+- Node.js >= 18.x  
+- npm or yarn  
+- MySQL database  
+- Git  
+
+### Installation Steps
+1. Clone the repository:
+   ```bash
+   git clone <your-repo-url>
+   cd <repo-folder>
+````
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+3. Copy `.env.example` to `.env` and update database credentials:
+
+   ```bash
+   cp .env.example .env
+   ```
+4. Run database migrations:
+
+   ```bash
+   npm run typeorm:migration:run
+   ```
+5. Seed the database with sample data:
+
+   ```bash
+   npm run seed
+   ```
+6. Start the application:
+
+   ```bash
+   npm run start:dev
+   ```
+
+---
+
+## Database Schema
+
+The system has **three main tables**:
+
+* **vendors** – Stores vendor information and payment terms.
+* **purchase_orders** – Stores POs with status, linked to vendors.
+* **payments** – Records payments against POs.
+
+Relationships are set using proper foreign keys, ensuring data integrity between vendors, purchase orders, and payments.
+
+---
+
+## Implemented Features
+
+### MUST-HAVE Features
+
+* CRUD APIs for vendors, purchase orders, and payments
+* PO number auto-generation and due date calculation
+* PO status auto-updates based on payments
+* Vendor outstanding balance analytics endpoint
+* Validation, error handling, and business rules enforcement
+
+### NICE-TO-HAVE Features
+
+* Soft delete for payments
+* JWT authentication for API protection
+* Pagination and filtering on list endpoints
+
+---
+
+## Key Design Decisions
+
+* Used **NestJS modules, controllers, and services** for clean architecture
+* PO status auto-updates and due date calculation implemented in service layer
+* MySQL chosen for relational integrity and ease of deployment
+* Focused on core business logic; authentication is simple with a hardcoded user
+
+---
+
+## API Endpoints
+
+### Vendors
+
+* `POST /vendors` – Create a vendor
+* `GET /vendors` – List all vendors
+* `GET /vendors/:id` – Vendor details with payment summary
+* `PUT /vendors/:id` – Update vendor
+
+### Purchase Orders
+
+* `POST /purchase-orders` – Create a PO
+* `GET /purchase-orders` – List all POs
+* `GET /purchase-orders/:id` – PO details with payment history
+* `PATCH /purchase-orders/:id/status` – Update PO status
+
+### Payments
+
+* `POST /payments` – Record a payment
+* `GET /payments` – List all payments
+* `GET /payments/:id` – Payment details
+
+### Analytics
+
+* `GET /analytics/vendor-outstanding` – Outstanding balance by vendor
+
+---
+
+## Testing the API
+
+**Sample Flow: Vendor → PO → Payments**
+
+1. Create a vendor via `POST /vendors`.
+2. Create a PO for the vendor via `POST /purchase-orders`.
+3. Record a partial payment via `POST /payments` → PO status updates to **Partially Paid**.
+4. Record another payment to complete the PO → PO status updates to **Fully Paid**.
+5. Attempting payment exceeding PO amount → API returns proper error.
+6. Query analytics endpoint → Returns correct outstanding balances.
+
+---
+
+## Time Breakdown
+
+* Database design: 6 hours
+* API development: 10 hours
+* Testing & debugging: 5 hours
+* **Total:** 21 hours
+
+---
+
+**Deployment:**
+
+* API hosted on **Render**
+* Database hosted on **Clever Cloud**
+* Tested with **Postman**
+
 ```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
